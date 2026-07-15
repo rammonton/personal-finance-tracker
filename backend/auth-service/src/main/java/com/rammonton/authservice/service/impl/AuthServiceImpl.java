@@ -10,6 +10,7 @@ import com.rammonton.authservice.exception.EmailAlreadyExistsException;
 import com.rammonton.authservice.repository.UserRepository;
 import com.rammonton.authservice.security.CustomUserDetails;
 import com.rammonton.authservice.security.CustomUserDetailsService;
+import com.rammonton.authservice.security.JwtService;
 import com.rammonton.authservice.service.AuthService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -27,6 +28,7 @@ public class AuthServiceImpl implements AuthService {
 
     private final AuthenticationManager authenticationManager;
     private final CustomUserDetailsService customUserDetailsService;
+    private final JwtService jwtService;
 
     @Override
     public RegisterResponse register(RegisterRequest request) {
@@ -68,10 +70,13 @@ public class AuthServiceImpl implements AuthService {
 
         User user = userDetails.getUser();
 
+        String token = jwtService.generateToken(userDetails);
+
         return LoginResponse.builder()
                 .id(user.getId())
                 .email(user.getEmail())
                 .role(user.getRole())
+                .token(token)
                 .build();
     }
 }
