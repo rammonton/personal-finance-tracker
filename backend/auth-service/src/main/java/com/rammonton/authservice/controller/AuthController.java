@@ -2,10 +2,10 @@ package com.rammonton.authservice.controller;
 
 import com.rammonton.authservice.dto.request.LoginRequest;
 import com.rammonton.authservice.dto.request.RegisterRequest;
-import com.rammonton.authservice.dto.response.ApiResponse;
 import com.rammonton.authservice.dto.response.LoginResponse;
 import com.rammonton.authservice.dto.response.RegisterResponse;
 import com.rammonton.authservice.service.AuthService;
+import com.rammonton.common.dto.ApiResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
