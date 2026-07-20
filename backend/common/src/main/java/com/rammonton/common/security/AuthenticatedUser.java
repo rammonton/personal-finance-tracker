@@ -1,36 +1,33 @@
-package com.rammonton.authservice.security;
+package com.rammonton.common.security;
 
-import com.rammonton.authservice.entity.User;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
-import java.util.List;
 
 @Getter
-@RequiredArgsConstructor
-public class CustomUserDetails implements UserDetails {
+@AllArgsConstructor
+public class AuthenticatedUser implements UserDetails {
 
-    private final User user;
+    private Long userId;
+    private String email;
+    private Collection<? extends GrantedAuthority> authorities;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of(
-                new SimpleGrantedAuthority("ROLE_" + user.getRole().name())
-        );
+        return authorities;
     }
 
     @Override
     public String getPassword() {
-        return user.getPassword();
+        return null;
     }
 
     @Override
     public String getUsername() {
-        return user.getEmail();
+        return email;
     }
 
     @Override
@@ -50,6 +47,6 @@ public class CustomUserDetails implements UserDetails {
 
     @Override
     public boolean isEnabled() {
-        return user.getEnabled();
+        return true;
     }
 }
