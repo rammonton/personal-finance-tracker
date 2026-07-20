@@ -1,4 +1,4 @@
-package com.rammonton.authservice.security;
+package com.rammonton.common.security;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -19,7 +19,6 @@ import java.io.IOException;
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtService jwtService;
-    private final CustomUserDetailsService customUserDetailsService;
 
     @Override
     protected void doFilterInternal(
@@ -37,22 +36,19 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         final String jwt = authHeader.substring(7);
 
-        final String userEmail = jwtService.extractUsername(jwt);
+        if (SecurityContextHolder.getContext().getAuthentication() == null) {
+            if (jwtService.isTokenValid(jwt)) {
+                String email = jwtService.extractEmail(jwt);
+                Long userId = jwtService.extractUserId(jwt);
+                var authorities = jwtService.extractAuthorities(jwt);
 
-        if (userEmail != null
-                && SecurityContextHolder.getContext().getAuthentication() == null) {
-
-            CustomUserDetails userDetails =
-                    (CustomUserDetails) customUserDetailsService
-                            .loadUserByUsername(userEmail);
-
-            if (jwtService.isTokenValid(jwt, userDetails)) {
+                AuthenticatedUser authenticatedUser = new AuthenticatedUser(userId, email, authorities);
 
                 UsernamePasswordAuthenticationToken authToken =
                         new UsernamePasswordAuthenticationToken(
-                                userDetails,
+                                authenticatedUser,
                                 null,
-                                userDetails.getAuthorities()
+                                authenticatedUser.getAuthorities()
                         );
 
                 authToken.setDetails(
@@ -63,11 +59,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 SecurityContextHolder.getContext()
                         .setAuthentication(authToken);
             }
-
         }
 
         filterChain.doFilter(request, response);
-
     }
-
 }
